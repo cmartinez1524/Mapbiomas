@@ -1,0 +1,21 @@
+{
+ "fecha": "2026-10-18T04:00:16.857Z",
+ "ventanas_ok": 172,
+ "ventanas_fallidas": [
+  [
+   "147",
+   1169.28
+  ],
+  [
+   "236",
+   207.35999999999999
+  ],
+  [
+   "368",
+   489.59999999999997
+  ]
+ ],
+ "filas": 204182,
+ "fuente": "gs://mapbiomas-public/initiatives/chile/{coverage (Col.1), fire/collection1}",
+ "dem": "AWS Terrain Tiles (terrarium z11)"
+}

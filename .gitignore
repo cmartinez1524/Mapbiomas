@@ -1,0 +1,7 @@
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+# límites regionales originales (71 MB): se descargan de MapBiomas; el repo trae la versión simplificada
+datos/mapbiomas_chile_regiones_nivel2.zip
+# renders temporales del informe
+informe/*.jpg

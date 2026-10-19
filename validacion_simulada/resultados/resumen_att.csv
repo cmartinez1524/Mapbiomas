@@ -1,0 +1,5 @@
+Estimador,ATT,IC 95% inf,IC 95% sup
+"Emparejado, regla conservadora",0.062067513594148506,0.056913494467995526,0.06748667421065209
+"Emparejado, regla estricta",0.10074221099482737,0.09600188519323108,0.1049254064457568
+"Ingenuo (quemado vs no quemado, sin control)",0.05219583270817768,,
+Verdadero (simulación),0.06867731676788044,,

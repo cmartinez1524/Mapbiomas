@@ -1,0 +1,11 @@
+covariable,Antes,Después
+n_cambios_pre,0.112,0.044
+eastness,0.155,0.041
+log_dist_agr,0.161,0.073
+northness,0.166,0.053
+log_dist_silv,0.176,0.059
+slope,0.194,0.051
+elev,0.251,0.068
+log_dist_urb,0.274,0.066
+lon,0.308,0.046
+lat,0.453,0.025

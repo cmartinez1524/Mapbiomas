@@ -67,7 +67,7 @@ Según el ATBD y el repositorio `mapbiomas/chile-fire`, el filtro LULC borra la 
    - La regla *conservadora* mantiene controles con conversión posterior, que pueden ser incendios ocultos. Da la cota inferior.
    - La regla *estricta* los descarta. Da la cota superior, deliberadamente amplia, porque trata toda conversión estable de los controles como incendio oculto.
 
-En la simulación, el efecto verdadero (6,9 %) queda dentro de las cotas (6,2 %–10,1 %), mientras el contraste ingenuo marca 5,2 % (Fig. 6).
+En la simulación, el efecto verdadero (6,9 %) queda dentro de las cotas (6,2 %–10,1 %), mientras el contraste ingenuo marca 5,2 % (Anexo A, Fig. 9 del informe).
 
 ## Plan hasta la postulación (cierre: 29–30 oct 2026; meta: entregar el 28)
 
@@ -82,11 +82,11 @@ En la simulación, el efecto verdadero (6,9 %) queda dentro de las cotas (6,2 %�
 
 ## Checklist de las bases
 
-- [ ] Usa datos de MapBiomas Chile: Cobertura Col. 2 + Fuego Col. 1 (req. 1).
-- [ ] Trabajo concluido con resultados verificables (req. 3).
-- [ ] En español (req. 5).
-- [ ] Código público en GitHub o anexado (req. 8).
-- [ ] Cita según https://chile.mapbiomas.org/terminos-de-uso/ (req. 9).
+- [x] Usa datos de MapBiomas Chile: Cobertura Col. 2 + Fuego Col. 1 (req. 1).
+- [x] Trabajo concluido con resultados verificables (req. 3).
+- [x] En español (req. 5).
+- [x] Código público en GitHub o anexado (req. 8).
+- [x] Cita según https://chile.mapbiomas.org/terminos-de-uso/ (req. 9).
 - [ ] Anexo I firmado por todos los autores (req. 10).
 - [ ] Postulado por el formulario oficial antes del cierre.
 

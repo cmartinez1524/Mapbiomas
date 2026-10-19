@@ -1,25 +1,43 @@
-"""Análisis de robustez sobre los datos reales (Colección 1)."""
-import numpy as np, pandas as pd
+"""Análisis de robustez sobre los datos reales.
+
+Uso:  python robustez.py        -> Colección 1 (cohortes 2014-2021)
+      python robustez.py col2   -> Colección 2 (cohortes 2014-2021; 2022-2023 se analizan aparte)
+
+Todas las estimaciones ponderan cada píxel quemado por w_muestral (hectáreas que representa)
+y los resúmenes usan cohortes balanceadas (todas observables en la ventana completa).
+"""
 import sys, os
+import numpy as np, pandas as pd
 import fuegocausal as fc
+
 COL2 = len(sys.argv) > 1 and sys.argv[1] == "col2"
 if COL2:
-    exec(open("prep_col2.py").read()); COH = range(2014, 2024); RES = "resultados_col2/"
+    exec(open("prep_col2.py").read()); RES = "resultados_col2/"
 else:
     fc.usar_coleccion1(2005, 2022)
-    exec(open("prep_real.py").read()); COH = range(2014, 2022); RES = "resultados/"
-os.makedirs(RES, exist_ok=True)
+    exec(open("prep_real.py").read()); RES = "resultados/"
+COH = range(2014, 2022)                 # cohortes con censura consistente del filtro de Fuego
 Y0, Y1 = fc.LULC_Y0, fc.LULC_Y1
+KV = 3                                  # ventana principal: k = 1..3
+os.makedirs(RES, exist_ok=True)
+
 pares, bal = fc.panel_apilado(df, cohortes=COH, verbose=False)
 L = fc.matriz_lulc(df)
+R = list(fc.RESULTADOS[list(fc.RESULTADOS)[0]])
+W = df["w_muestral"].to_numpy()
 
-def persistente(clases, k, dur=3):
-    """1 si el píxel está en `clases` en g+k, g+k+1, ..., g+k+dur-1 (todos observables)."""
-    pass
+
+def boot_ponderado(m, col="d", n=300, semilla=1):
+    """Media ponderada por w con IC bootstrap por bloques espaciales."""
+    g = m.assign(wd=m.w * m[col]).groupby("b")[["wd", "w"]].sum()
+    S, Wb = g.wd.to_numpy(), g.w.to_numpy()
+    rng = np.random.default_rng(semilla)
+    bs = [S[ix].sum() / Wb[ix].sum() for ix in (rng.integers(0, len(S), len(S)) for _ in range(n))]
+    return S.sum() / Wb.sum(), np.quantile(bs, .025), np.quantile(bs, .975)
+
 
 out = {}
-# 1) Conversión persistente: uso antrópico 3 años seguidos desde k (solo cohortes con g+k+2 <= 2022)
-R = list(fc.RESULTADOS[list(fc.RESULTADOS)[0]])
+# 1) Conversión persistente: uso antrópico 3 años seguidos desde k0 (cohortes con g+k0+2 <= Y1)
 filas = []
 for k0 in [1, 2, 3]:
     sel = pares[pares.cohorte + k0 + 2 <= Y1]
@@ -29,50 +47,64 @@ for k0 in [1, 2, 3]:
     yt, yc = Y(it), Y(ic)
     d = pd.DataFrame({"i": it, "yt": yt, "ycw": yc * w, "b": df.bloque.to_numpy()[it], "grupo": sel.grupo.to_numpy()})
     m = d.groupby(["i", "b", "grupo"]).agg(yt=("yt", "first"), yc=("ycw", "sum")).reset_index()
-    m["d"] = m.yt - m.yc
+    m["d"], m["w"] = m.yt - m.yc, W[m.i.to_numpy()]
     for gr, mm in [("Todos", m)] + list(m.groupby("grupo")):
-        # bootstrap por bloque
-        bs = mm.groupby("b")["d"].agg(["sum", "count"])
-        rng = np.random.default_rng(1); S, N = bs["sum"].to_numpy(), bs["count"].to_numpy()
-        boots = [S[ix].sum() / N[ix].sum() for ix in (rng.integers(0, len(S), len(S)) for _ in range(300))]
-        filas.append({"desde_k": k0, "grupo": gr, "ATT_persistente": mm.d.mean(),
-                      "IC_inf": np.quantile(boots, .025), "IC_sup": np.quantile(boots, .975),
-                      "conv_quemados": mm.yt.mean(), "conv_controles": mm.yc.mean(), "n": len(mm)})
-pers = pd.DataFrame(filas); out["persistente"] = pers
-print("== Conversión persistente (uso antrópico 3 años seguidos)\n", pers.round(4).to_string())
+        att, lo, hi = boot_ponderado(mm)
+        filas.append({"desde_k": k0, "grupo": gr, "ATT_persistente": att, "IC_inf": lo, "IC_sup": hi,
+                      "conv_quemados": np.average(mm.yt, weights=mm.w), "conv_controles": np.average(mm.yc, weights=mm.w),
+                      "n": len(mm)})
+out["persistente"] = pers = pd.DataFrame(filas)
+print("== Conversión persistente (uso antrópico 3 años seguidos, ponderado)\n", pers.round(4).to_string())
 
-# 2) ¿A dónde vuelven los píxeles quemados que pasan a mosaico en k=1?
+# 2) ¿Dónde están en k=4 los quemados que eran uso antrópico en k=1?
 tr = pares[["i_trat", "cohorte", "grupo"]].drop_duplicates()
 tr = tr[tr.cohorte + 4 <= Y1]
 ii, g = tr.i_trat.to_numpy(), tr.cohorte.to_numpy()
 en1 = np.isin(L[ii, g + 1 - Y0], R)
-k4 = L[ii[en1], g[en1] + 4 - Y0]
-dest = pd.Series(k4).map(fc.CLASES).value_counts(normalize=True)
+dest = pd.Series(L[ii[en1], g[en1] + 4 - Y0]).map(fc.CLASES)
+out["destino_k4"] = dest = dest.groupby(dest).size().div(len(dest)).sort_values(ascending=False).rename("proporcion")
 print("\n== Quemados en uso antrópico en k=1: clase en k=4\n", dest.round(3).to_string())
-print("   grupo previo:", tr.grupo[en1].value_counts(normalize=True).round(3).to_dict())
-out["destino_k4"] = dest
 
-# 3) Sensibilidad del emparejamiento (efecto principal k=1..5, regla conservadora)
-sens = []
-for kv, cal in [(1, 0.2), (3, 0.2), (5, 0.1), (1, 0.05)]:
-    p2, _ = fc.panel_apilado(df, cohortes=COH, k_vecinos=kv, caliper_sd=cal, verbose=False)
-    d2 = fc.diferencias_por_tratado(df, p2, set(R))
-    r = fc.att_promedio_post(d2, 1, 5, n_boot=200).iloc[0]
-    sens.append({"k_vecinos": kv, "caliper_sd": cal, "ATT": r.ATT, "IC_inf": r.IC_inf, "IC_sup": r.IC_sup})
-sens = pd.DataFrame(sens); out["sensibilidad"] = sens
-print("\n== Sensibilidad\n", sens.round(4).to_string())
-
-# 4) Placebo: "incendio" asignado 4 años antes del real (g' = g-4) sobre píxeles estables
-#    -> se espera ATT ~ 0 en k'=1..3 (antes del incendio real)
+# 3) Resúmenes balanceados y sensibilidad del emparejamiento
 dif = fc.diferencias_por_tratado(df, pares, set(R), k_min=-6, k_max=8)
-pl = dif[dif.k.between(-5, -3)].d.mean()
-print(f"\n== Placebo pre-incendio (k=-5..-3): ATT medio = {pl:.4f}")
+res = []
+for kv in [3, 5]:
+    r = fc.att_promedio_post(dif, 1, kv, n_boot=300).iloc[0]
+    res.append({"ventana": f"k=1-{kv}", "cohortes": f"2014-{Y1 - kv}", **r[["ATT", "IC_inf", "IC_sup", "n_trat"]].to_dict()})
+sens = []
+for kn, cal in [(1, 0.2), (3, 0.2), (5, 0.1), (1, 0.05)]:
+    p2, _ = fc.panel_apilado(df, cohortes=COH, k_vecinos=kn, caliper_sd=cal, verbose=False)
+    d2 = fc.diferencias_por_tratado(df, p2, set(R))
+    r = fc.att_promedio_post(d2, 1, KV, n_boot=200).iloc[0]
+    sens.append({"k_vecinos": kn, "caliper_sd": cal, "ATT": r.ATT, "IC_inf": r.IC_inf, "IC_sup": r.IC_sup})
+out["resumenes"] = pd.DataFrame(res)
+out["sensibilidad"] = pd.DataFrame(sens)
+print("\n== Resúmenes balanceados\n", out["resumenes"].round(4).to_string())
+print("\n== Sensibilidad (k=1-3)\n", out["sensibilidad"].round(4).to_string())
 
-# 5) Regiones x grupo (dónde se concentra)
+# 4) Tendencias previas
+pre = dif[dif.k.between(-6, -3)]
+print(f"\n== Tendencias previas (k=-6..-3): media ponderada = {np.average(pre.d, weights=pre.w):.4f}")
+
+# 5) Región x cobertura previa (k=1-3, cohortes balanceadas)
 dif["region"] = df.region.to_numpy()[dif.i_trat.to_numpy()]
-rg = fc.att_promedio_post(dif.assign(rg=dif.region + " | " + dif.grupo), 1, 5, por="rg", n_boot=150)
-rg = rg[rg.n_trat >= 800].sort_values("ATT", ascending=False)
-print("\n== Región x cobertura previa (n>=800)\n", rg[["rg", "ATT", "IC_inf", "IC_sup", "n_trat"]].round(4).to_string())
-out["region_grupo"] = rg
+rg = fc.att_promedio_post(dif.assign(rg=dif.region + " | " + dif.grupo), 1, KV, por="rg", n_boot=200)
+out["region_grupo"] = rg = rg[rg.n_trat >= 800].sort_values("ATT", ascending=False)
+print("\n== Región x cobertura previa (k=1-3, n>=800)\n", rg[["rg", "ATT", "IC_inf", "IC_sup", "n_trat"]].round(4).to_string())
+
+# 6) Colección 2: cohortes 2022-2023, que el filtro de Fuego no alcanza a censurar
+if COL2:
+    p3, _ = fc.panel_apilado(df, cohortes=range(2022, 2024), verbose=False)
+    d3 = fc.diferencias_por_tratado(df, p3, set(R), k_min=-3, k_max=2)
+    filas = []
+    for (c, k), x in d3[d3.k.between(0, 2)].groupby(["cohorte", "k"]):
+        att, lo, hi = boot_ponderado(x.rename(columns={"bloque": "b"}))
+        filas.append({"cohorte": c, "k": k, "ATT": att, "IC_inf": lo, "IC_sup": hi, "n": len(x)})
+    for gr, x in d3[d3.k == 1].groupby("grupo"):
+        att, lo, hi = boot_ponderado(x.rename(columns={"bloque": "b"}))
+        filas.append({"cohorte": "2022-2023", "k": 1, "grupo": gr, "ATT": att, "IC_inf": lo, "IC_sup": hi, "n": len(x)})
+    out["cohortes_recientes"] = pd.DataFrame(filas)
+    print("\n== Cohortes 2022-2023 (sin censura del filtro)\n", out["cohortes_recientes"].round(4).to_string())
+
 for k, v in out.items():
     v.to_csv(f"{RES}robustez_{k}.csv")

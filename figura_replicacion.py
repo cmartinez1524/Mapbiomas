@@ -11,7 +11,8 @@ def het(d, f, col, val):
 def es(d, res, k):
     t = pd.read_csv(d + "event_study_todos.csv"); r = t[(t.resultado.str.startswith(res)) & (t.k == k)].iloc[0]; return (r.ATT, r.IC_inf, r.IC_sup)
 def rg(d, key):
-    t = pd.read_csv(d + "robustez_region_grupo.csv"); r = t[t.rg == key].iloc[0]; return (r.ATT, r.IC_inf, r.IC_sup)
+    t = pd.read_csv(d + "robustez_region_grupo.csv"); t = t[t.rg == key]
+    return (t.ATT.iloc[0], t.IC_inf.iloc[0], t.IC_sup.iloc[0]) if len(t) else (np.nan, np.nan, np.nan)
 D1, D2 = "resultados/", "resultados_col2/"
 filas = [
   ("Uso antrópico · cota inferior", resumen(D1, "Emparejado, regla conservadora"), resumen(D2, "Emparejado, regla conservadora")),
@@ -28,11 +29,12 @@ fig, (ax, ax2) = plt.subplots(1, 2, figsize=(9.6, 4.6), gridspec_kw={"width_rati
 y = np.arange(len(filas))[::-1]
 for (n, a, b), yy in zip(filas, y):
     for v, off, col, lab in [(a, 0.17, "#9AA5B1", "Colección 1 (2000–2022)"), (b, -0.17, "#B23A1F", "Colección 2 (1999–2024)")]:
+        if np.isnan(v[0]): continue
         ax.errorbar(v[0], yy + off, xerr=[[v[0] - v[1]], [v[2] - v[0]]], fmt="o", color=col, ms=5, capsize=2, lw=1.2,
                     label=lab if yy == y[0] else None)
 ax.axvline(0, color="0.3", lw=0.8)
 ax.set_yticks(y, [f[0] for f in filas]); ax.xaxis.set_major_formatter(mtick.PercentFormatter(1, decimals=0))
-ax.set_xlabel("Efecto del fuego sobre el uso antrópico (pp, k = 1–5)")
+ax.set_xlabel("Efecto del fuego sobre el uso antrópico (pp, k = 1–3, cohortes balanceadas)")
 ax.legend(frameon=False, loc="lower right", fontsize=8.5)
 # degradación del bosque (k = 2) en panel aparte (otra escala)
 d1, d2 = es(D1, "Degradación", 2), es(D2, "Degradación", 2)

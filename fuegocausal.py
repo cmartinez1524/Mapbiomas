@@ -402,9 +402,18 @@ def att_event_study(dif: pd.DataFrame, n_boot: int = 300, semilla: int = 7,
 
 
 def att_promedio_post(dif: pd.DataFrame, k_desde: int = 1, k_hasta: int = 5,
-                      por: str | None = None, n_boot: int = 300, semilla: int = 11):
-    """ATT promedio en la ventana post (k_desde..k_hasta), con IC bootstrap por bloques."""
+                      por: str | None = None, n_boot: int = 300, semilla: int = 11,
+                      balanceado: bool = True):
+    """ATT promedio en la ventana post (k_desde..k_hasta), con IC bootstrap por bloques.
+
+    balanceado=True (por defecto) usa solo las cohortes con TODOS los años k_desde..k_hasta
+    observables (cohorte + k_hasta <= último año de cobertura). Así el resumen es el promedio
+    de ATT_k sobre una composición fija de cohortes: sin balancear, las cohortes recientes
+    (observadas solo en los primeros años) pesan únicamente en k bajos y distorsionan el promedio.
+    """
     d = dif[(dif["k"] >= k_desde) & (dif["k"] <= k_hasta)]
+    if balanceado:
+        d = d[d["cohorte"] + k_hasta <= LULC_Y1]
     d = d.groupby(["i_trat", "cohorte", "bloque"] + ([por] if por else []),
                   as_index=False).agg(d=("d", "mean"), w=("w", "first"))
     d["k"] = 0

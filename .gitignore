@@ -5,3 +5,6 @@ __pycache__/
 datos/mapbiomas_chile_regiones_nivel2.zip
 # renders temporales del informe
 informe/*.jpg
+# Anexo I (datos personales): se entrega solo en el formulario
+informe/Anexo_I_*
+informe/build_anexo.js

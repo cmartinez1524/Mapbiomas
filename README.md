@@ -1,6 +1,9 @@
 # ¿El fuego abre la puerta al cambio de uso del suelo en Chile?
 
-Evaluación causal a nivel de píxel con MapBiomas Chile (Cobertura y Uso, Colección 2) y MapBiomas Fuego (Colección 1).
+Evaluación causal a nivel de píxel con MapBiomas Chile (Cobertura y Uso del Suelo, Colecciones 1 y 2) y MapBiomas Fuego (Colección 1) en el centro-sur de Chile, 1999–2024.
+
+**Respuesta corta: no en general; sí en el bosque nativo.** Con la Colección 2, el efecto promedio sobre el paso a uso antrópico queda entre −0,25 y +0,50 pp (k = 1–3, cohortes 2014–2021). El bosque nativo quemado se convierte más (+0,9 pp; +1,4 pp con la Colección 1; hasta +6,4 pp en las cohortes 2022–2023 sin censura). El impacto dominante es la degradación del bosque nativo (+26–27 pp a los dos años). No hay efecto sobre la infraestructura.
+
 Postulación al **Premio MapBiomas Chile, 1.ª edición — Categoría Análisis Técnico o Científico**.
 
 Autor: Cristóbal Martínez Arochas, Ingeniería Civil en Ciencia de Datos, PUCV.
@@ -20,6 +23,8 @@ Es el dato que falta en el debate sobre prohibir el cambio de uso de suelo en te
 | Archivo | Qué hace |
 |---|---|
 | `HALLAZGOS.md` | Resumen de resultados, validez y limitaciones de la corrida con datos reales. |
+| `informe/` | Informe de postulación (`Informe_Premio_MapBiomas_Fuego_CambioUso.pdf/.docx`) y su generador (`build_informe.js`). |
+| `figuras_extra.py`, `figura_replicacion.py` | Mapa de focos, conversión persistente y figura de replicación entre colecciones. |
 | `extraccion_navegador.js` | **Extracción usada:** lee por ventanas los GeoTIFF públicos de MapBiomas (Cobertura Col. 1 y Fuego Col. 1) sin necesidad de cuenta. |
 | `datos/` | Muestra extraída (`muestra_mapbiomas_col1.csv`, 204.182 píxeles), hectáreas quemadas por cohorte y metadatos. |
 | `02_analisis_causal.ipynb` | Emparejamiento, estudio de eventos, cotas, heterogeneidad, hectáreas y figuras. Ejecutado con los datos reales (`FUENTE = "real"`, `COLECCION = 1`). |
@@ -44,12 +49,13 @@ Dependencias: `earthengine-api` (y opcionalmente `geemap`) para el 01; `numpy pa
 
 ## Diseño metodológico
 
-- **Unidad:** píxel de 30 m. **Tratamiento:** primer incendio detectado en el año *g* (cohortes 2014–2022).
+- **Unidad:** píxel de 30 m. **Tratamiento:** primer incendio detectado en el año *g*. El análisis principal usa las cohortes 2014–2021; las de 2022–2023 se analizan aparte, porque el filtro del producto Fuego se trunca al final de la serie y no las censura.
 - **Elegibilidad:** el píxel está en el mismo grupo de cobertura (bosque, matorral, pastizal/estepa o silvicultura) en *g−2* y *g−1*.
 - **Controles:** píxeles nunca quemados entre 2013 y 2025, del mismo grupo basal y la misma región. Se emparejan por puntaje de propensión 1:1 con reemplazo y caliper de 0,2 DE del logit.
 - **Covariables (fijadas en 2012):** elevación, pendiente, orientación, distancias a caminos (GRIP4), zona urbana, agricultura y plantaciones, coordenadas e inestabilidad previa de la cobertura.
 - **Estimando:** ATT_k, la diferencia en la probabilidad de estar en la clase de destino *k* años después del incendio. Los destinos son uso antrópico (agricultura, pastura e infraestructura), cada uno por separado, silvicultura y degradación de bosque.
-- **Inferencia:** bootstrap por bloques espaciales de unos 10 km.
+- **Efecto resumen:** promedio de k = 1–3 solo con cohortes balanceadas (observables en los tres años). Robustez con k = 1–5.
+- **Inferencia:** bootstrap por bloques espaciales de unos 10 km, ponderado por superficie.
 - **Ponderación:** según las hectáreas quemadas por región y cohorte, para escalar el ATT a hectáreas atribuibles.
 
 ### El punto crítico: el filtro del producto Fuego
@@ -59,7 +65,7 @@ Según el ATBD y el repositorio `mapbiomas/chile-fire`, el filtro LULC borra la 
 1. **Regla simétrica:** se excluye de tratados y controles todo píxel que el filtro habría borrado en *g*.
 2. **Identificación parcial (cotas):**
    - La regla *conservadora* mantiene controles con conversión posterior, que pueden ser incendios ocultos. Da la cota inferior.
-   - La regla *estricta* los descarta. Da la cota superior.
+   - La regla *estricta* los descarta. Da la cota superior, deliberadamente amplia, porque trata toda conversión estable de los controles como incendio oculto.
 
 En la simulación, el efecto verdadero (6,9 %) queda dentro de las cotas (6,2 %–10,1 %), mientras el contraste ingenuo marca 5,2 % (Fig. 6).
 

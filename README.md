@@ -82,7 +82,7 @@ En la simulación, el efecto verdadero (6,9 %) queda dentro de las cotas (6,2 %�
 
 ## Validación visual de las conversiones
 
-`muestra_validacion.py` sortea 140 píxeles de bosque nativo quemado (100 que el mapa da como convertidos a uso antrópico tres años después y 40 que no) y escribe en `validacion_visual/` una planilla para completar, un KML para Google Earth Pro y el protocolo de revisión (`PROTOCOLO.md`). La revisión es a ciegas: la planilla no dice a qué grupo pertenece cada punto; la clave queda en `clave_muestra.csv`.
+`muestra_validacion.py` sortea 146 píxeles de bosque nativo quemado (102 que el mapa da como convertidos a uso antrópico tres años después y 44 que no) y escribe en `validacion_visual/` una planilla para completar, un KML para Google Earth Pro y el protocolo de revisión (`PROTOCOLO.md`). La revisión es a ciegas: la planilla no dice a qué grupo pertenece cada punto; la clave queda en `clave_muestra.csv`.
 
 ## Entorno
 

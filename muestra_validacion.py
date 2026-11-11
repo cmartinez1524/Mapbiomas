@@ -11,7 +11,7 @@ import numpy as np, pandas as pd
 import fuegocausal as fc
 
 exec(open("prep_col2.py").read())
-N_CONV, N_COMP, SEMILLA = 100, 40, 2026
+N_CONV, N_COMP, SEMILLA = 100, 40, 2026   # con el mínimo de 5 por región resultan 102 y 44
 pares, _ = fc.panel_apilado(df, cohortes=range(2014, 2022), grupos=["Bosque"], verbose=False)
 L = fc.matriz_lulc(df)
 R = list(fc.RESULTADOS[list(fc.RESULTADOS)[0]])

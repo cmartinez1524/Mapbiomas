@@ -4,6 +4,8 @@
 
 **Muestra.** 140 píxeles de bosque nativo quemados entre 2014 y 2021: 100 que el mapa clasifica como agricultura, pastura o infraestructura tres años después del incendio y 40 que no. El orden es aleatorio y la planilla no indica el grupo (revisión a ciegas).
 
+**Ejemplos.** `ejemplos_trayectorias.png` muestra la cobertura año a año de 16 puntos de la muestra, con los cuatro casos que conviene distinguir al revisar: conversión que persiste, conversión transitoria, degradación a matorral y bosque sin cambio.
+
 ## Pasos
 
 1. Abrir `muestra_validacion.kml` en Google Earth Pro (de escritorio) y activar **Imágenes históricas** (ícono del reloj).

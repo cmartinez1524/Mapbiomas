@@ -31,6 +31,7 @@ Es el dato que falta en el debate sobre prohibir el cambio de uso de suelo en te
 | `asignar_regiones.py`, `datos/regiones_zona_estudio.geojson` | Región oficial de cada píxel (límites MapBiomas Chile, nivel político 2). |
 | `robustez.py`, `prep_real.py` | Conversión persistente, destino de las conversiones transitorias, sensibilidad, placebo espacial, región × cobertura. |
 | `muestra_validacion.py`, `validacion_visual/` | Muestra, KML y protocolo para validar visualmente las conversiones de bosque nativo quemado. |
+| `figura_ejemplos.py` | Ejemplos visuales de la muestra: trayectoria anual de cobertura de 16 píxeles (`validacion_visual/ejemplos_trayectorias.png`, Fig. 11 del informe). |
 | `requirements.txt` | Dependencias de Python. |
 | `figuras/`, `resultados/` | Figuras y tablas de la corrida real. |
 | `fuegocausal.py` | Módulo con todo el estimador (reutilizable y documentado). |

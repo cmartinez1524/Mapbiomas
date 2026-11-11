@@ -311,6 +311,7 @@ const conclusiones = [
   BUL("el módulo del estimador (fuegocausal.py);"),
   BUL("los notebooks ejecutados (02_analisis_causal.ipynb y 02b_analisis_causal_col2.ipynb);"),
   BUL("los análisis de robustez, incluido el placebo espacial (robustez.py), y las figuras complementarias;"),
+  BUL("la muestra, el protocolo y los ejemplos para la validación visual de las conversiones (muestra_validacion.py, figura_ejemplos.py y la carpeta validacion_visual);"),
   BUL("las muestras extraídas."),
   P("Repositorio: **https://github.com/cmartinez1524/Mapbiomas**", { after: 200 }),
 ];
@@ -371,6 +372,9 @@ const anexos = [
   NUM("**Focalizar en el bosque nativo.** Restringir el cambio de uso en terrenos quemados con bosque nativo, con prioridad en Valparaíso y La Araucanía, y fiscalizar en el primer año, cuando ocurre la mayor parte de la conversión. Una prohibición pareja para todo terreno quemado apuntaría a un efecto que en promedio es nulo.", "recom"),
   NUM("**Poner la restauración al centro.** El impacto dominante del fuego es la degradación persistente del bosque nativo; la ley debería exigir y financiar su restauración activa.", "recom"),
   NUM("**Monitorear con datos abiertos.** El método se puede repetir cada año con las nuevas colecciones de MapBiomas para evaluar el efecto de la ley que se apruebe.", "recom"),
+  H1("Anexo E. Ejemplos de trayectorias de píxeles"),
+  P("La Figura 11 muestra, año a año, la cobertura que la Colección 2 asigna a 16 píxeles de bosque nativo quemado, tomados de una muestra aleatoria de 140 píxeles preparada para la validación visual con imágenes de alta resolución (carpeta validacion_visual del repositorio). Ilustra los cuatro destinos que distingue el análisis: la conversión que persiste, la conversión transitoria, la degradación a matorral y la permanencia como bosque. De los 100 píxeles de la muestra clasificados como uso antrópico tres años después del incendio, 48 siguen en uso antrópico en 2024 y 38 vuelven a aparecer como bosque nativo; por eso el análisis informa por separado la conversión persistente (sección 5.5)."),
+  ...figura("figuras_col2/fig9_ejemplos_trayectorias.png", "Trayectorias de cobertura (MapBiomas Chile, Colección 2, 1999–2024) de 16 píxeles de bosque nativo quemado. Cada fila es un píxel, identificado por su código en la muestra de validación, su región y el año del incendio (marca negra).", 16),
 ];
 
 // ============================ DOCUMENTO ============================

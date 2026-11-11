@@ -12,7 +12,7 @@
 2. Para cada punto (V001, V002, …), mirar un cuadro de unos 30 × 30 m centrado en el punto:
    - una imagen del año anterior al incendio o lo más cercana posible;
    - una imagen de tres años después del incendio en adelante.
-3. Completar en `muestra_validacion.csv`:
+3. Completar en `muestra_validacion.xlsx` (columnas amarillas, con listas desplegables; el `.csv` trae lo mismo):
    - `bosque_antes`: ¿había bosque nativo antes del incendio? (si / no / dudoso)
    - `uso_observado_despues`: bosque, matorral, pastizal, plantación, cultivo, pradera, construcción, camino, suelo desnudo u otro.
    - `conversion_real`: ¿el punto pasó a uso agrícola, ganadero o construido? (si / no / dudoso)

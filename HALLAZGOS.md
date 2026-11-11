@@ -27,7 +27,7 @@
 | Cota inferior, k = 1–5 | −0,47 (−0,64 – −0,29) | +0,82 (0,07 – 1,52) |
 | Desde **bosque nativo** | **+0,94** (0,44 – 1,78) | **+1,36** (0,71 – 2,15) |
 | Desde plantación | −0,02 (n. s.) | +1,93 (0,73 – 3,23) |
-| Desde matorral | −1,23 (−1,55 – −0,93) | −0,12 (n. s.) |
+| Desde matorral (atribuible al lugar, ver placebo) | −1,23 (−1,55 – −0,93) | −0,12 (n. s.) |
 | Valparaíso · bosque nativo | **+3,2** (1,3 – 6,3) | +1,8 (0,4 – 3,1) |
 | Araucanía · bosque nativo | **+1,3** (0,2 – 2,8) | **+6,3** (3,5 – 10,0) |
 | Región de La Araucanía | +0,18 (n. s.) | +9,3 (6,3 – 12,1) |
@@ -56,6 +56,7 @@
 - **Balance:** todas las diferencias estandarizadas quedan bajo 0,1 después del emparejamiento (máximo 0,099; antes, hasta 0,54).
 - **Tendencias previas:** son pequeñas (media −0,22 pp en k = −6 a −3), y su signo sugiere que la cota inferior está sesgada hacia abajo.
 - **Robustez:** el efecto es estable a 1, 3 o 5 vecinos y a calipers de 0,05 a 0,2 (−0,25 a −0,28 pp).
+- **Placebo espacial:** píxeles nunca quemados a menos de 1 km de una quema, comparados con otros a más de 5 km. En bosque nativo es nulo (+0,08 pp; −0,43 – 0,62), así que el efecto del bosque no se debe al lugar. En matorral es −1,34 pp (−1,98 – −0,73), igual que el efecto estimado (−1,23): esa diferencia negativa es del lugar, no del fuego. En el promedio, −0,86 pp. Con la Col. 1: promedio +0,47 (n. s.), bosque +0,27 (n. s.), plantación +1,74.
 - **Filtro del producto Fuego:** se replicó exactamente con las clases de la Col. 2. La cota superior es deliberadamente amplia, porque trata como incendio oculto toda conversión estable de los controles.
 
 ## Lectura para política pública

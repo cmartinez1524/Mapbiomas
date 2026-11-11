@@ -29,7 +29,9 @@ Es el dato que falta en el debate sobre prohibir el cambio de uso de suelo en te
 | `datos/` | Muestra extraída (`muestra_mapbiomas_col1.csv`, 204.182 píxeles), hectáreas quemadas por cohorte y metadatos. |
 | `02_analisis_causal.ipynb` | Emparejamiento, estudio de eventos, cotas, heterogeneidad, hectáreas y figuras. Ejecutado con los datos reales (`FUENTE = "real"`, `COLECCION = 1`). |
 | `asignar_regiones.py`, `datos/regiones_zona_estudio.geojson` | Región oficial de cada píxel (límites MapBiomas Chile, nivel político 2). |
-| `robustez.py`, `prep_real.py` | Conversión persistente, destino de las conversiones transitorias, sensibilidad, placebo, región × cobertura. |
+| `robustez.py`, `prep_real.py` | Conversión persistente, destino de las conversiones transitorias, sensibilidad, placebo espacial, región × cobertura. |
+| `muestra_validacion.py`, `validacion_visual/` | Muestra, KML y protocolo para validar visualmente las conversiones de bosque nativo quemado. |
+| `requirements.txt` | Dependencias de Python. |
 | `figuras/`, `resultados/` | Figuras y tablas de la corrida real. |
 | `fuegocausal.py` | Módulo con todo el estimador (reutilizable y documentado). |
 | `01_extraccion_gee.ipynb` | Alternativa en Earth Engine con la **Colección 2** (1999–2024); requiere cuenta de Earth Engine. |
@@ -69,16 +71,21 @@ Según el ATBD y el repositorio `mapbiomas/chile-fire`, el filtro LULC borra la 
 
 En la simulación, el efecto verdadero (6,9 %) queda dentro de las cotas (6,2 %–10,1 %), mientras el contraste ingenuo marca 5,2 % (Anexo A, Fig. 9 del informe).
 
-## Plan hasta la postulación (cierre: 29–30 oct 2026; meta: entregar el 28)
+## Plan hasta la postulación (cierre prorrogado: viernes 15 de enero de 2027, 23:59)
 
-| Fecha | Tarea |
+| Cuándo | Tarea |
 |---|---|
-| Dom 18 – Lun 19 | Correr el notebook 01: verificar el acceso, lanzar las exportaciones y escribir al profesor revisor. |
-| Mar 20 – Mié 21 | Correr el notebook 02 con los datos reales y revisar el balance y la sensibilidad (k vecinos, caliper). |
-| Jue 22 – Sáb 24 | Redactar el informe: introducción, objetivos, metodología, resultados y discusión, como piden las bases. |
-| Dom 25 | Mapa de cicatrices con el efecto por zona; resumen ejecutivo para política pública. |
-| Lun 26 – Mar 27 | Revisión del profesor (carta de revisión → criterio "Validación" = 2); repo público en GitHub. |
-| Mié 28 | Anexo I firmado, PDF final y postulación en el formulario. |
+| Noviembre | Validación visual de la muestra (`validacion_visual/`) y carta del profesor revisor. |
+| Diciembre | Si se publica la Colección 3 de Cobertura: repetir la extracción (`extraccion_gee_col2.js`) y el análisis, que suma un año de seguimiento a las cohortes 2022–2023 y vuelve evaluable el incendio de 2024. |
+| Hasta el 10 de enero | Informe final en PDF, Anexo I firmado y postulación en el formulario oficial. |
+
+## Validación visual de las conversiones
+
+`muestra_validacion.py` sortea 140 píxeles de bosque nativo quemado (100 que el mapa da como convertidos a uso antrópico tres años después y 40 que no) y escribe en `validacion_visual/` una planilla para completar, un KML para Google Earth Pro y el protocolo de revisión (`PROTOCOLO.md`). La revisión es a ciegas: la planilla no dice a qué grupo pertenece cada punto; la clave queda en `clave_muestra.csv`.
+
+## Entorno
+
+Python 3.11 o superior. Dependencias: `pip install -r requirements.txt`. El informe se compila con Node (`npm install docx`, luego `node informe/build_informe.js`).
 
 ## Checklist de las bases
 

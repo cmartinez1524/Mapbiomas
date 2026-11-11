@@ -106,5 +106,36 @@ if COL2:
     out["cohortes_recientes"] = pd.DataFrame(filas)
     print("\n== Cohortes 2022-2023 (sin censura del filtro)\n", out["cohortes_recientes"].round(4).to_string())
 
+# 7) Placebo espacial: píxeles NUNCA quemados a menos de 1 km de un píxel quemado de la cohorte g
+#    hacen de "tratados"; los controles son píxeles nunca quemados a más de 5 km de cualquier
+#    quema muestreada. Se repite todo el procedimiento. Si los lugares propensos al fuego se
+#    convirtieran más por razones ajenas al fuego (confusión espacial no observada), el placebo
+#    sería positivo. (Un placebo temporal no es informativo aquí: adelantar la fecha condiciona
+#    en que el píxel siga con vegetación hasta quemarse; para eso están las tendencias previas.)
+from scipy.spatial import cKDTree
+CERCA_KM, LEJOS_KM = 1.0, 5.0
+lat0 = np.deg2rad(df.lat.mean())
+xy = np.c_[df.lon * 111.32 * np.cos(lat0), df.lat * 110.57]
+ff, nq = df.fire_first.to_numpy(), df.fire_count.to_numpy() == 0
+d_cualq, _ = cKDTree(xy[~nq]).query(xy)
+enc = np.flatnonzero(np.isin(ff, list(COH)) & ~nq)
+d_coh, j_coh = cKDTree(xy[enc]).query(xy)
+dfp = df.copy()
+dfp["fire_first"], dfp["fire_count"], dfp["w_muestral"] = -1, 1, 1.0
+pseudo = nq & (d_coh < CERCA_KM)
+dfp.loc[pseudo, "fire_first"] = ff[enc][j_coh[pseudo]]
+dfp.loc[nq & (d_cualq > LEJOS_KM), "fire_count"] = 0
+pp, _ = fc.panel_apilado(dfp, cohortes=COH, verbose=False)
+dp = fc.diferencias_por_tratado(dfp, pp, set(R), k_min=-3, k_max=3)
+filas = []
+for etq, por in [("Todos", None), (None, "grupo")]:
+    r = fc.att_promedio_post(dp, 1, KV, por=por, n_boot=300)
+    for _, x in r.iterrows():
+        filas.append({"grupo": etq or x["grupo"], "ATT_placebo": x.ATT, "IC_inf": x.IC_inf,
+                      "IC_sup": x.IC_sup, "n_pseudo_tratados": int(x.n_trat)})
+out["placebo"] = pd.DataFrame(filas)
+print(f"\n== Placebo espacial (no quemados a <{CERCA_KM:g} km de una quema vs. a >{LEJOS_KM:g} km, k=1-3)\n",
+      out["placebo"].round(4).to_string())
+
 for k, v in out.items():
     v.to_csv(f"{RES}robustez_{k}.csv")
